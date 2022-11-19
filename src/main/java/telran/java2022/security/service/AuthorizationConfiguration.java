@@ -1,23 +1,39 @@
 package telran.java2022.security.service;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 
-@EnableWebSecurity
-public class AuthorizationConfiguration extends WebSecurityConfigurerAdapter {
+@Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class AuthorizationConfiguration {
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http.httpBasic();//Basic authentication
-		http.csrf().disable();//No only get request
-		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+	@Bean
+	public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+		http.httpBasic();// Basic authentication
+		http.csrf().disable();// No only get request
+		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);// don`t save session
 
-		http.authorizeRequests()
-				.antMatchers("/account/register/**").permitAll()//From this url(any method) allow all
-				.antMatchers("/forum/posts/**").permitAll()
-				.anyRequest().authenticated();//Any request require authentication
+		http.authorizeRequests(
+				authorize -> authorize
+				.mvcMatchers("/account/register/**", "/forum/posts/**").permitAll()// From this url(any method) allow all
+				.mvcMatchers("/account/user/password/**").hasRole("USER")
+				.mvcMatchers("/account/user/*/role/*/**").hasRole("ADMINISTRATOR")
+				.mvcMatchers(HttpMethod.PUT, "/account/user/{login}/**").access("#login == authentication.name")
+				.mvcMatchers(HttpMethod.DELETE, "/account/user/{login}/**").access("#login == authentication.name or hasRole('ADMINISTRATOR')")
+				.mvcMatchers(HttpMethod.POST, "/forum/post/{author}/**").access("#author ==authentication.name")
+				.mvcMatchers(HttpMethod.PUT, "/forum/post/{id}/comment/{author}/**").access("#author ==authentication.name")
+				.mvcMatchers(HttpMethod.PUT, "/forum/post/{id}/like/**").authenticated()
+				.mvcMatchers(HttpMethod.PUT, "/forum/post/{id}/**").access("@customSecurity.checkPostAuthor(#id, authentication.name)")				
+				.mvcMatchers(HttpMethod.DELETE, "/forum/post/{id}/**").access("@customSecurity.checkPostAuthor(#id, authentication.name) or hasRole('MODERATOR')")
+
+				.anyRequest().authenticated()// Any request require authentication
+		);
+		return http.build();
 	}
 
 }

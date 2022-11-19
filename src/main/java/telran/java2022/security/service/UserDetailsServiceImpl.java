@@ -22,7 +22,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		UserAccount userAccount = repository.findById(username).orElseThrow(()->new UsernameNotFoundException(username));
 		
 		String [] roles = userAccount.getRoles().stream()
-				.map(r->"ROLE "+r.toUpperCase())
+				.map(r->"ROLE_"+r.toUpperCase())
 				.toArray(String[]::new);
 		return new User(username, userAccount.getPassword(), AuthorityUtils.createAuthorityList(roles ));
 	}

@@ -3,6 +3,7 @@ package telran.java2022.login.controller;
 import java.security.Principal;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,11 +45,13 @@ public class LoginController {
 	}
 
 	@DeleteMapping("/user/{user}")
+//	@PreAuthorize("#user.equals(principal.getUserName()) or hasRole('ADMINISTRATOR')")
 	public UserDto removeUser(@PathVariable String user) {
 		return loginService.removeUser(user);
 	}
 
 	@PutMapping("/user/{user}")
+//	@PreAuthorize("#user == authentication.name")
 	public UserDto updateUser(@RequestBody UpdateNameDto updateNameDto,
 			@PathVariable String user) {
 		return loginService.updateUser(user, updateNameDto);
