@@ -21,17 +21,16 @@ public class AuthorizationConfiguration {
 		http.authorizeRequests(
 				authorize -> authorize
 				.mvcMatchers("/account/register/**", "/forum/posts/**").permitAll()// From this url(any method) allow all
-				.mvcMatchers("/account/user/password/**").hasAnyRole("USER", "CHANGEPASS")
-				.mvcMatchers("/account/user/*/role/*/**").hasRole("ADMINISTRATOR")
-				.mvcMatchers(HttpMethod.POST,"/account/login/**").hasAnyRole("USER")
-				.mvcMatchers(HttpMethod.PUT, "/account/user/{login}/**").access("#login == authentication.name and hasRole('USER')")
-				.mvcMatchers(HttpMethod.DELETE, "/account/user/{login}/**").access("#login == authentication.name or hasAnyRole('ADMINISTRATOR', 'USER')")
-				.mvcMatchers(HttpMethod.POST, "/forum/post/{author}/**").access("#author ==authentication.name and hasRole('USER')")
-				.mvcMatchers(HttpMethod.PUT, "/forum/post/{id}/comment/{author}/**").access("#author ==authentication.name and hasRole('USER')")
-				.mvcMatchers(HttpMethod.PUT, "/forum/post/{id}/like/**").hasRole("USER")
-				.mvcMatchers(HttpMethod.PUT, "/forum/post/{id}/**").access("@customSecurity.checkPostAuthor(#id, authentication.name) and hasRole('USER')")				
-				.mvcMatchers(HttpMethod.DELETE, "/forum/post/{id}/**").access("@customSecurity.checkPostAuthor(#id, authentication.name) or hasAnyRole('MODERATOR','USER')")
-
+				.mvcMatchers("/account/user/password/**").authenticated()
+				.mvcMatchers("/account/user/*/role/*/**").access("@customPassSecurity.checkPass(authentication.name) and hasRole('ADMINISTRATOR')")
+				.mvcMatchers(HttpMethod.POST,"/account/login/**").access("@customPassSecurity.checkPass(authentication.name)")
+				.mvcMatchers(HttpMethod.PUT, "/account/user/{login}/**").access("#login == authentication.name and @customPassSecurity.checkPass(authentication.name)")
+				.mvcMatchers(HttpMethod.DELETE, "/account/user/{login}/**").access("@customPassSecurity.checkPass(authentication.name) and #login == authentication.name or hasAnyRole('ADMINISTRATOR', 'USER')")
+				.mvcMatchers(HttpMethod.POST, "/forum/post/{author}/**").access("#author ==authentication.name and @customPassSecurity.checkPass(authentication.name)")
+				.mvcMatchers(HttpMethod.PUT, "/forum/post/{id}/comment/{author}/**").access("#author ==authentication.name and @customPassSecurity.checkPass(authentication.name)")
+				.mvcMatchers(HttpMethod.PUT, "/forum/post/{id}/like/**").access("@customPassSecurity.checkPass(authentication.name)")
+				.mvcMatchers(HttpMethod.DELETE, "/forum/post/{id}/**").access("(@customSecurity.checkPostAuthor(#id, authentication.name) or hasRole('MODERATOR')) and @customPassSecurity.checkPass(authentication.name)")
+				.mvcMatchers( "/forum/post/{id}/**").access("@customPassSecurity.checkPass(authentication.name) and @customSecurity.checkPostAuthor(#id, authentication.name)")
 				.anyRequest().authenticated()// Any request require authentication
 				
 				

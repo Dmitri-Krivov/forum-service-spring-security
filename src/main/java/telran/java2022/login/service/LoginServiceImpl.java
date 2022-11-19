@@ -92,7 +92,6 @@ public class LoginServiceImpl implements LoginService, CommandLineRunner {
 //		String password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
 		user.setPassword(password);
 		user.setDateOfCreationPas(LocalDate.now());
-		user.removeRole("CHANGEPASS");
 		userRepository.save(user);
 	}
 
