@@ -1,5 +1,6 @@
 package telran.java2022.login.model;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,13 +9,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @EqualsAndHashCode(of = "login")
 @Document(collection = "Users")
-@NoArgsConstructor
 public class UserAccount {
 	@Id
 	@Setter
@@ -25,9 +24,19 @@ public class UserAccount {
 	String firstName;
 	@Setter
 	String lastName;
+	@Setter
+	LocalDate dateOfCreationPas;
 	Set<String> roles = new HashSet<>();
+	
+	public UserAccount() {
+		roles = new HashSet<>();
+		roles.add("USER");
+		this.dateOfCreationPas = LocalDate.now();
+
+	}
 
 	public UserAccount(String login, String password, String firstName, String lastName) {
+		this();
 		this.login = login;
 		this.password = password;
 		this.firstName = firstName;
@@ -41,5 +50,7 @@ public class UserAccount {
 	public boolean removeRole(String role) {
 		return roles.remove(role);
 	}
-
+	public boolean removeAllRole() {
+		return roles.removeAll(roles);
+	}
 }

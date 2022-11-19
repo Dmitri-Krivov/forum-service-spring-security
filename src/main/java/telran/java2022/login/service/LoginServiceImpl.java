@@ -1,5 +1,7 @@
 package telran.java2022.login.service;
 
+import java.time.LocalDate;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +35,7 @@ public class LoginServiceImpl implements LoginService, CommandLineRunner {
 		String password = passwordEncoder.encode(createUserDto.getPassword());
 //		String password = BCrypt.hashpw(createUserDto.getPassword(), BCrypt.gensalt());
 		user.setPassword(password);
-		user.addRole("USER");
+//		user.addRole("USER");
 		user = userRepository.save(user);
 
 		return modelMapper.map(user, UserDto.class);
@@ -89,6 +91,8 @@ public class LoginServiceImpl implements LoginService, CommandLineRunner {
 		String password = passwordEncoder.encode(newPassword);
 //		String password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
 		user.setPassword(password);
+		user.setDateOfCreationPas(LocalDate.now());
+		user.removeRole("CHANGEPASS");
 		userRepository.save(user);
 	}
 

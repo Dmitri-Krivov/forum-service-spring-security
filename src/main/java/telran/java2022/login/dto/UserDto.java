@@ -1,5 +1,6 @@
 package telran.java2022.login.dto;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 import lombok.AllArgsConstructor;
@@ -17,5 +18,6 @@ public class UserDto {
 	String login;
 	String firstName;
 	String lastName;
+	LocalDate dateOfCreationPas;
 	Set<String> roles;
 }
