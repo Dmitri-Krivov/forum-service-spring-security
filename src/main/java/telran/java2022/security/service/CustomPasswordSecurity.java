@@ -12,7 +12,7 @@ import telran.java2022.login.model.UserAccount;
 
 @Service("customPassSecurity")
 @RequiredArgsConstructor
-public class CustomPasswordSecutity {
+public class CustomPasswordSecurity {
 	@Value("${password.period:30}")
 	long DAYSTOCHAINGEPASSWORD;
 	final UserRepository userRepository;
