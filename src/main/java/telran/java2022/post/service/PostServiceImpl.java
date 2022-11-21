@@ -17,10 +17,11 @@ import telran.java2022.post.dto.PostDto;
 import telran.java2022.post.dto.exceptions.PostNotFoundException;
 import telran.java2022.post.model.Comment;
 import telran.java2022.post.model.Post;
+import telran.java2022.post.service.logging.PostLogger;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
+//@Slf4j
 public class PostServiceImpl implements PostService {
 	
 	final PostRepository postRepository;
@@ -37,22 +38,24 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public PostDto getPost(String id) {
-		log.info("post with id {} handled", id);
+//		log.info("post with id {} handled", id);
 		Post post = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id));
 		return modelMapper.map(post, PostDto.class);
 	}
 
 	@Override
+	@PostLogger
 	public PostDto removePost(String id) {
-		log.info("post with id {} handled", id);
+//		log.info("post with id {} handled", id);
 		Post post = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id));
 		postRepository.delete(post);
 		return modelMapper.map(post, PostDto.class);
 	}
 
 	@Override
+	@PostLogger
 	public PostDto updatePost(NewPostDto postUpdateDto, String id) {
-		log.info("post with id {} handled", id);
+//		log.info("post with id {} handled", id);
 		Post post = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id));
 		String content = postUpdateDto.getContent();
 		if (content != null) {
@@ -71,6 +74,7 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
+	@PostLogger
 	public void addLike(String id) {
 		Post post = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id));
 		post.addLike();
@@ -79,7 +83,7 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public PostDto addComment(String id, String author, NewCommentDto newCommentDto) {
-		log.info("post with id {} handled", id);
+//		log.info("post with id {} handled", id);
 		Post post = postRepository.findById(id).orElseThrow(() -> new 	PostNotFoundException(id));
 		Comment comment = new Comment(author, newCommentDto.getMessage());
 		post.addComment(comment);
